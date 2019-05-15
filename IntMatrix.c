@@ -113,6 +113,7 @@ int PrintMatrixToFile(const IntMatrix* const pMatr, const char* filename) {
 
 int DeleteColumn(IntMatrix* const pMatr, const unsigned int iColumn) {
   unsigned int i, j;
+  int* tempColumn;
 
   if (!pMatr) {
     printf("Error: in DeleteColumn(): Matrix doesn't exist!\n");
@@ -127,8 +128,15 @@ int DeleteColumn(IntMatrix* const pMatr, const unsigned int iColumn) {
     for (j = iColumn; j < pMatr->nColumns; j++)
       pMatr->elements[i][j] = pMatr->elements[i][j + 1];  
 
-  for (i = 0; i < pMatr->nRows; i++)
-    pMatr->elements[i] = (int*)realloc(pMatr->elements[i], (pMatr->nColumns - 1)*sizeof(int));
+  for (i = 0; i < pMatr->nRows; i++) {
+    tempColumn = (int*)realloc(pMatr->elements[i], (pMatr->nColumns - 1)*sizeof(int));
+    if (!tempColumn) {
+      printf("Error: in DeleteColumn(): cannot reallocate memory!\n");
+      DeleteMatrix(pMatr);
+      exit(3);
+    }
+    pMatr->elements[i] = tempColumn;
+  }
   pMatr->nColumns--;
 
   printf("Column No%u deleted successfully\n", iColumn);    // debugging info
@@ -137,6 +145,7 @@ int DeleteColumn(IntMatrix* const pMatr, const unsigned int iColumn) {
 
 int DeleteRow(IntMatrix* const pMatr, const unsigned int iRow) {
   unsigned int i;
+  int** tempRow;
 
   if (!pMatr) {
     printf("Error: in DeleteRow(): Matrix doesn't exist!\n");
@@ -152,7 +161,13 @@ int DeleteRow(IntMatrix* const pMatr, const unsigned int iRow) {
   for (i = iRow; i < pMatr->nRows; i++)
     pMatr->elements[i] = pMatr->elements[i+1];  
 
-  pMatr->elements = (int**)realloc(pMatr->elements, (pMatr->nRows - 1)*sizeof(int*));
+  tempRow = (int**)realloc(pMatr->elements, (pMatr->nRows - 1) * sizeof(int*));
+  if (!tempRow) {
+    printf("Error: in DeleteRow(): cannot reallocate memory!\n");
+    DeleteMatrix(pMatr);
+    exit(3);
+  }
+  pMatr->elements = tempRow;
   pMatr->nRows--;
 
   printf("Row No%u deleted successfully\n", iRow);    // debugging info
