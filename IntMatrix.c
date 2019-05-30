@@ -36,8 +36,9 @@ IntMatrix MakeMatrix(const char* filename) {
     retMatr.elements[i] = (int*)malloc(retMatr.nColumns * sizeof(int));
     if (!retMatr.elements[i]) {
       printf("Error: in MakeMatrix(): Cannot allocate memory!\n");
-      for (j = 0; j < i; j++)
+      for (j = 0; j < i; j++) {
         free(retMatr.elements[j]);
+      }
       free(retMatr.elements);
       fclose(inputFile);
       exit(3);
@@ -48,8 +49,9 @@ IntMatrix MakeMatrix(const char* filename) {
     for (j = 0; j < retMatr.nColumns; j++) {
       if (fscanf(inputFile, "%d", &retMatr.elements[i][j]) != 1) {
         printf("Error: in MakeMatrix(): Wrong format of input file %s!\n", filename);
-        for (k = 0; k < retMatr.nRows; k++)
+        for (k = 0; k < retMatr.nRows; k++) {
           free(retMatr.elements[k]);
+	}
         free(retMatr.elements);
         fclose(inputFile);
         exit(2);
@@ -57,8 +59,9 @@ IntMatrix MakeMatrix(const char* filename) {
     }
   }
 
-  if (!feof(inputFile))
+  if (!feof(inputFile)) {
     printf("Warning: in MakeMatrix(): Input file %s contains extra data!\n", filename);
+  }
 
   fclose(inputFile);
 
@@ -74,8 +77,9 @@ void DeleteMatrix(IntMatrix* const pMatr) {
     return;
   }
 
-  for (i = 0; i < pMatr->nRows; i++)
+  for (i = 0; i < pMatr->nRows; i++) {
     free(pMatr->elements[i]);
+  }
   free(pMatr->elements);
   pMatr->elements = NULL;
 
@@ -124,9 +128,11 @@ int DeleteColumn(IntMatrix* const pMatr, const unsigned int iColumn) {
     return 2;
   }
 
-  for (i = 0; i < pMatr->nRows; i++)
-    for (j = iColumn; j < pMatr->nColumns; j++)
-      pMatr->elements[i][j] = pMatr->elements[i][j + 1];  
+  for (i = 0; i < pMatr->nRows; i++) {
+    for (j = iColumn; j < pMatr->nColumns; j++) {
+      pMatr->elements[i][j] = pMatr->elements[i][j + 1];
+    }
+  }
 
   for (i = 0; i < pMatr->nRows; i++) {
     tempColumn = (int*)realloc(pMatr->elements[i], (pMatr->nColumns - 1)*sizeof(int));
@@ -158,8 +164,9 @@ int DeleteRow(IntMatrix* const pMatr, const unsigned int iRow) {
 
   free(pMatr->elements[iRow]);
 
-  for (i = iRow; i < pMatr->nRows; i++)
-    pMatr->elements[i] = pMatr->elements[i+1];  
+  for (i = iRow; i < pMatr->nRows; i++) {
+    pMatr->elements[i] = pMatr->elements[i+1];
+  }
 
   tempRow = (int**)realloc(pMatr->elements, (pMatr->nRows - 1) * sizeof(int*));
   if (!tempRow) {
@@ -184,9 +191,11 @@ int ComputeSumOfAllElements(const IntMatrix* const pMatr) {
   }
 
   sum = 0;
-  for (i = 0; i < pMatr->nRows; i++)
-    for (j = 0; j < pMatr->nColumns; j++)
+  for (i = 0; i < pMatr->nRows; i++) {
+    for (j = 0; j < pMatr->nColumns; j++) {
       sum += pMatr->elements[i][j];
+    }
+  }
 
   printf("Sum of all matrix elements computed successfully\n");    // debugging info
   return sum;
